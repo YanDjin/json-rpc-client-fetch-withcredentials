@@ -1,16 +1,11 @@
 {
-  "name": "json-rpc-client-fetch",
-  "version": "0.2.3",
-  "description": "A simple fetch based SJON RPC client written in ES6.",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src --presets es2015 --out-dir dist",
-    "prepublish": "npm run build"
-  },
+  "name": "json-rpc-client-fetch-withcredentials",
+  "version": "0.3.3",
+  "description": "A simple fetch based JSON RPC client written in ES6.",
+  "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/apinnecke/js-json-rpc-client.git"
+    "url": "git+https://github.com/pedroresende/js-json-rpc-client-withcredentials.git"
   },
   "keywords": [
     "json-api",
@@ -18,16 +13,14 @@
     "fetch"
   ],
   "author": "Alexander Pinnecke <alexander.pinnecke@googlemail.com>",
+  "contributors": [
+    "Pedro Resende <pedro.m.m.resende@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/apinnecke/js-json-rpc-client/issues"
+    "url": "https://github.com/pedroresende/js-json-rpc-client-withcredentials/issues"
   },
-  "homepage": "https://github.com/apinnecke/js-json-rpc-client#readme",
+  "homepage": "https://github.com/pedroresende/js-json-rpc-client-withcredentials#readme",
   "dependencies": {},
-  "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2017": "^6.24.1",
-    "mocha": "^3.2.0"
-  }
+  "devDependencies": {}
 }

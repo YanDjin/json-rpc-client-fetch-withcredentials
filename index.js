@@ -8,10 +8,11 @@ const defaultHeaders = {
 };
 
 export class JsonRpcClient {
-    constructor({ endpoint = '/rpc', headers = {}, config }) {
+    constructor({ endpoint = '/rpc', headers = {}, withCredentials = true, config }) {
         this.lastId = 0;
         this.endpoint = endpoint;
         this.config = Object.assign({}, defaultConfig, config);
+        this.withCredentials = withCredentials;
         this.headers = Object.assign({}, defaultHeaders, headers);
     }
 
@@ -20,6 +21,7 @@ export class JsonRpcClient {
         
         const req = {
             method: 'POST',
+            withCredentials: this.withCredentials,
             headers: this.headers,
             body: JSON.stringify({
                 jsonrpc: '2.0',
