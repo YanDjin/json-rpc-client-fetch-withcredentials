@@ -1,47 +1,44 @@
-const defaultConfig = {
-    debug: false,
-};
+'use strict';
 
-const defaultHeaders = {
+var defaultHeaders = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
 };
 
-export class JsonRpcClient {
-    constructor({ endpoint = '/rpc', headers = {}, withCredentials = true, config }) {
-        this.lastId = 0;
-        this.endpoint = endpoint;
-        this.config = Object.assign({}, defaultConfig, config);
-        this.withCredentials = withCredentials;
-        this.headers = Object.assign({}, defaultHeaders, headers);
-    }
+var settings = {
+  lastId: 1,
+  endPoint: null,
+  headers: defaultHeaders,
+  credentials: null,
+  debug: null,
+}
 
-    request(method, ...params) {
-        const id = this.lastId++;
-        
-        const req = {
-            method: 'POST',
-            withCredentials: this.withCredentials,
-            headers: this.headers,
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id,
-                method,
-                params: Array.isArray(params) ? params : [params],
-            }),
-        };
+function JsonRpcClient(endPoint, credentials = 'same-origin', debug = false) {
+  settings.endPoint = endPoint;
+  settings.credentials = credentials;
+  settings.debug = debug;
+}
 
-        if (this.config.debug === true) {
-            // eslint-disable-next-line no-console
-            console.log('Executing request', this.lastId, 'to', this.endpoint, ':', req);
-        }
+JsonRpcClient.prototype.request = function(method, params) {
+  let id = settings.lastId++;
 
-        return fetch(this.endpoint, req)
-            .then(res => checkStatus(res))
-            .then(res => parseJSON(res))
-            .then(res => checkError(res, req, this.config.debug))
-            .then(res => logResponse(res, this.config.debug));
-    }
+  let req = {
+    method: 'POST',
+    credentials: settings.credentials,
+    headers: settings.headers,
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id,
+      method,
+      params: Array.isArray(params) ? params : {params},
+    }),
+  };
+
+  return fetch(settings.endPoint, req)
+      .then(res => checkStatus(res))
+      .then(res => parseJSON(res))
+      .then(res => checkError(res, req, settings.debug))
+      .then(res => logResponse(res, settings.debug));
 }
 
 function parseJSON(response) {
@@ -115,3 +112,5 @@ export class RpcError extends Error {
         return this.response;
     }
 }
+
+export default JsonRpcClient;
