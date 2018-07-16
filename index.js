@@ -10,14 +10,16 @@ var settings = {
   lastId: 1,
   endPoint: null,
   headers: defaultHeaders,
-  credentials: null,
-  debug: null,
+  credentials: 'include',
+  debug: false,
 }
 
-function JsonRpcClient(endPoint, credentials = 'include', debug = false) {
+function JsonRpcClient(endPoint, debug) {
   settings.endPoint = endPoint;
   settings.credentials = credentials;
-  settings.debug = debug;
+  if (debug !== '') {
+    settings.debug = debug;
+  }
 }
 
 JsonRpcClient.prototype.request = function(method, params = {}) {
