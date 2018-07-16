@@ -3,7 +3,7 @@
 ## INSTALL
 
 ```
-$ yarn add js-json-rpc-client-withcredentials
+$ yarn add json-rpc-client-fetch-withcredentials
 ```
 
 Open you `main.js` file and add the following:
@@ -11,9 +11,9 @@ Open you `main.js` file and add the following:
 ```
 import JsonRpcClient from 'json-rpc-client-fetch-withcredentials';
 
-let client = JsonRpcClient(<url>, <credentials>, <config>)
+let client = new JsonRpcClient(<url>, <credentials>, <config>)
 
-client.request('method_name', params)
+client.request('method_name', {params})
 .then((response) => {
     console.log(response);
 })
