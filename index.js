@@ -22,8 +22,12 @@ function JsonRpcClient(endPoint, debug) {
   }
 }
 
-JsonRpcClient.prototype.request = function(method, params = {}) {
+JsonRpcClient.prototype.request = function(method, params) {
   let id = settings.lastId++;
+
+  if (params === '') {
+    params = {};
+  }
 
   let req = {
     method: 'POST',
