@@ -16,14 +16,15 @@ var settings = {
 
 function JsonRpcClient(endPoint, debug) {
   settings.endPoint = endPoint;
-  settings.credentials = credentials;
   if (debug !== '') {
     settings.debug = debug;
   }
 }
 
 JsonRpcClient.prototype.request = function(method, params) {
-  let id = settings.lastId++;
+  let id = settings.lastId;
+  id++;
+  settings.lastId = id;
 
   if (params === '') {
     params = {};
