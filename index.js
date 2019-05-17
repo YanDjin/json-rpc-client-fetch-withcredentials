@@ -36,6 +36,9 @@ JsonRpcClient.prototype.request = function(method, params = {}) {
   };
 
   return fetch(settings.endPoint, req)
+    .catch(error => {
+      throw error;
+    })
     .then(res => checkStatus(res))
     .then(res => parseJSON(res))
     .then(res => checkError(res, req, settings.debug))
