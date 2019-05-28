@@ -25,9 +25,6 @@ function JsonRpcClient(endPoint, credentials = 'include', newHeaders = null, deb
 
 JsonRpcClient.prototype.request = function(method, params = {}) {
   let id = settings.lastId++;
-
-
-  console.log(settings.headers);
   let req = {
     method: 'POST',
     credentials: settings.credentials,
