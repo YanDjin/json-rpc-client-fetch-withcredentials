@@ -11,7 +11,7 @@ Open you `main.js` file and add the following:
 ```
 import JsonRpcClient from 'json-rpc-client-fetch-withcredentials';
 
-let client = new JsonRpcClient(<url>, <config>)
+let client = new JsonRpcClient(<url>, <credencials>, newHeaders, debug)
 
 client.request('method_name', {params})
 .then((response) => {

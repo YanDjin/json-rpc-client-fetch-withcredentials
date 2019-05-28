@@ -1,7 +1,7 @@
 'use strict';
 
 var defaultHeaders = {
-  Accept: 'application/json, text/plain, */*',
+  'Accept': 'application/json, text/plain, */*',
   'Content-Type': 'application/json',
   'X-Requested-With': 'XMLHttpRequest'
 };
@@ -14,15 +14,20 @@ var settings = {
   debug: null
 };
 
-function JsonRpcClient(endPoint, credentials = 'include', debug = false) {
+function JsonRpcClient(endPoint, credentials = 'include', newHeaders = null, debug = false) {
   settings.endPoint = endPoint;
   settings.credentials = credentials;
   settings.debug = debug;
+  if (newHeaders !== null) {
+    settings.headers[Object.keys(newHeaders)[0]] = Object.values(newHeaders)[0];
+  }
 }
 
 JsonRpcClient.prototype.request = function(method, params = {}) {
   let id = settings.lastId++;
 
+
+  console.log(settings.headers);
   let req = {
     method: 'POST',
     credentials: settings.credentials,
