@@ -20,7 +20,6 @@ function JsonRpcClient(endPoint, credentials = 'include', newHeaders = null, deb
   settings.debug = debug;
   if (newHeaders !== null) {
     for (const [key, value] of Object.entries(newHeaders)) {
-      console.log(key, value);
       settings.headers[key] = value;
     }
   }
