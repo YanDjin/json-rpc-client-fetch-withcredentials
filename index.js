@@ -25,7 +25,13 @@ function JsonRpcClient(endPoint, credentials = 'include', newHeaders = null, deb
   }
 }
 
-JsonRpcClient.prototype.request = function(method, params = {}) {
+JsonRpcClient.prototype.setNewHeaders = (newHeaders = {}) => {
+  for (const [key, value] of Object.entries(newHeaders)) {
+    settings.headers[key] = value;
+  }
+}
+
+JsonRpcClient.prototype.request = (method, params = {}) => {
   let id = settings.lastId++;
   let req = {
     method: 'POST',
