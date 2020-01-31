@@ -1,6 +1,6 @@
 {
   "name": "json-rpc-client-fetch-withcredentials",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "A simple fetch based JSON RPC client written in ES6.",
   "main": "index.js",
   "repository": {

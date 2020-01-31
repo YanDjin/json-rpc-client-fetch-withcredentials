@@ -47,6 +47,10 @@ JsonRpcClient.prototype.request = (method, params = {}) => {
 
   return fetch(settings.endPoint, req)
     .catch(error => {
+      if (String(error).includes("Failed to fetch")) {
+        return location.reload();
+      }
+
       throw error;
     })
     .then(res => checkStatus(res))
