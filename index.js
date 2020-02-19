@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 var defaultHeaders = {
-  'Accept': 'application/json, text/plain, */*',
-  'Content-Type': 'application/json',
-  'X-Requested-With': 'XMLHttpRequest'
+  Accept: "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "X-Requested-With": "XMLHttpRequest"
 };
 
 var settings = {
@@ -11,13 +11,29 @@ var settings = {
   endPoint: null,
   headers: defaultHeaders,
   credentials: null,
-  debug: null
+  debug: null,
+  callbacksByStatusCode: {}
 };
 
-function JsonRpcClient(endPoint, credentials = 'include', newHeaders = null, debug = false) {
+/**
+ * callbacksByStatusCode must be a json with this content
+ * key : status code
+ * value : json composed of and object or multiple objects in an array
+ *         each object is composed of a func field (function definition) and a params field (array containing the function parameters)
+ *         the parameters are taken by the function in order
+ * ex: {
+ *    403: {
+ *      func: console.log,
+ *      params: ['aaa', 'bbb']
+ *    }
+ * }
+ * result: on result, if the status code is 403 : console.log('aaa', 'bbb'); is executed
+ */
+function JsonRpcClient(endPoint, credentials = "include", newHeaders = null, debug = false, callbacksByStatusCode = {}) {
   settings.endPoint = endPoint;
   settings.credentials = credentials;
   settings.debug = debug;
+  settings.callbacksByStatusCode = callbacksByStatusCode;
   if (newHeaders !== null) {
     for (const [key, value] of Object.entries(newHeaders)) {
       settings.headers[key] = value;
@@ -29,16 +45,16 @@ JsonRpcClient.prototype.setNewHeaders = (newHeaders = {}) => {
   for (const [key, value] of Object.entries(newHeaders)) {
     settings.headers[key] = value;
   }
-}
+};
 
 JsonRpcClient.prototype.request = (method, params = {}) => {
   let id = settings.lastId++;
   let req = {
-    method: 'POST',
+    method: "POST",
     credentials: settings.credentials,
     headers: settings.headers,
     body: JSON.stringify({
-      jsonrpc: '2.0',
+      jsonrpc: "2.0",
       id: id,
       method: method,
       params: params
@@ -47,25 +63,37 @@ JsonRpcClient.prototype.request = (method, params = {}) => {
 
   return fetch(settings.endPoint, req)
     .catch(error => {
-      if (String(error).includes("Failed to fetch")) {
-        return location.reload();
-      }
-
       throw error;
     })
-    .then(res => checkStatus(res))
+    .then(res => checkStatus(res, settings.callbacksByStatusCode))
     .then(res => parseJSON(res))
     .then(res => checkError(res, req, settings.debug))
     .then(res => logResponse(res, settings.debug));
-}
+};
 
 function parseJSON(response) {
   return response.json();
 }
 
-function checkStatus(response) {
+function checkStatus(response, callbacksByStatusCode) {
   // we assume 400 as valid code here because it's the default return code when sth has gone wrong,
   // but then we have an error within the response, no?
+
+  for (let index in callbacksByStatusCode) {
+    if (response.status != index) {
+      continue;
+    }
+
+    if (!Array.isArray(callbacksByStatusCode[index])) {
+      callbacksByStatusCode[index] = [callbacksByStatusCode[index]];
+    }
+
+    for (let i = 0; i < callbacksByStatusCode[index].length; i++) {
+      const { func, params } = callbacksByStatusCode[index][i];
+      func(...params);
+    }
+  }
+
   if (response.status >= 200 && response.status <= 400) {
     return response;
   }
@@ -94,8 +122,8 @@ function checkError(data, req, debug = false) {
 function logResponse(response, debug = false) {
   if (debug === true) {
     /* eslint-disable no-console */
-    console.log('Got response for id', response.id, 'with response', response.result);
-    console.log('Response message for request', response.id, ':', response.result.message);
+    console.log("Got response for id", response.id, "with response", response.result);
+    console.log("Response message for request", response.id, ":", response.result.message);
     /* eslint-enable no-console */
   }
   return response.result;
@@ -107,8 +135,8 @@ function logResponse(response, debug = false) {
 export class RpcError extends Error {
   constructor(message, request, response, code) {
     super(message);
-    this.name = 'RpcError';
-    this.message = message || '';
+    this.name = "RpcError";
+    this.message = message || "";
     this.request = request;
     this.response = response;
     this.code = code;

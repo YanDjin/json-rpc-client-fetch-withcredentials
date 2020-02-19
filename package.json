@@ -1,6 +1,6 @@
 {
   "name": "json-rpc-client-fetch-withcredentials",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A simple fetch based JSON RPC client written in ES6.",
   "main": "index.js",
   "repository": {
@@ -17,10 +17,6 @@
     "Pedro Resende <pedro.m.m.resende@gmail.com>"
   ],
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pedroresende/json-rpc-client-fetch-withcredentials/issues"
-  },
-  "homepage": "https://github.com/pedroresende/json-rpc-client-fetch-withcredentials#readme",
   "dependencies": {},
   "devDependencies": {}
 }
