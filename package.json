@@ -1,5 +1,5 @@
 {
-  "name": "json-rpc-client-fetch-withcredentials",
+  "name": "json-rpc-client-fetch-withcredentials-withcallbacksbystatus",
   "version": "0.9.1",
   "description": "A simple fetch based JSON RPC client written in ES6.",
   "main": "index.js",
@@ -14,9 +14,14 @@
   ],
   "author": "Alexander Pinnecke <alexander.pinnecke@googlemail.com>",
   "contributors": [
-    "Pedro Resende <pedro.m.m.resende@gmail.com>"
+    "Pedro Resende <pedro.m.m.resende@gmail.com>",
+    "Yan Djin <yandjin@gmail.com"
   ],
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/YanDjin/json-rpc-client-fetch-withcredentials-withcallbacksbystatus/issues"
+  },
+  "homepage": "https://github.com/YanDjin/json-rpc-client-fetch-withcredentials-withcallbacksbystatus#readme",
   "dependencies": {},
   "devDependencies": {}
 }
