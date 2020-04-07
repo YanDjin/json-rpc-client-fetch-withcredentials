@@ -12,11 +12,11 @@ var settings = {
   headers: defaultHeaders,
   credentials: null,
   debug: null,
-  callbacksByStatusCode: {}
+  callbacksOnResponse: []
 };
 
 /**
- * callbacksByStatusCode must be a json with this content
+ * callbacksOnResponse must be a json with this content
  * key : status code
  * value : json composed of and object or multiple objects in an array
  *         each object is composed of a func field (function definition) and a params field (array containing the function parameters)
@@ -29,11 +29,11 @@ var settings = {
  * }
  * result: on result, if the status code is 403 : console.log('aaa', 'bbb'); is executed
  */
-function JsonRpcClient(endPoint, credentials = "include", newHeaders = null, debug = false, callbacksByStatusCode = {}) {
+function JsonRpcClient(endPoint, credentials = "include", newHeaders = null, debug = false, callbacksOnResponse = []) {
   settings.endPoint = endPoint;
   settings.credentials = credentials;
   settings.debug = debug;
-  settings.callbacksByStatusCode = callbacksByStatusCode;
+  settings.callbacksOnResponse = callbacksOnResponse;
   if (newHeaders !== null) {
     for (const [key, value] of Object.entries(newHeaders)) {
       settings.headers[key] = value;
@@ -65,35 +65,65 @@ JsonRpcClient.prototype.request = (method, params = {}) => {
     .catch(error => {
       throw error;
     })
-    .then(res => checkStatus(res, settings.callbacksByStatusCode))
-    .then(res => parseJSON(res))
+    .then(res => checkStatus(res))
+    .then(res => parseJSONAndCheckCallbacks(res))
     .then(res => checkError(res, req, settings.debug))
     .then(res => logResponse(res, settings.debug));
 };
 
-function parseJSON(response) {
-  return response.json();
+function parseJSONAndCheckCallbacks(response) {
+  let callbacksOnResponse = settings.callbacksOnResponse;
+
+  return response.json().then(json => {
+    callBackLoop: for (let i = 0; i < callbacksOnResponse.length; i++) {
+      if (!callbacksOnResponse[i].hasOwnProperty("condition")) {
+        continue;
+      }
+      const { code, method } = callbacksOnResponse[i].condition;
+      const { func, params } = callbacksOnResponse[i];
+
+      if (code !== undefined && !Array.isArray(code)) {
+        code = [code];
+      } else if (code !== undefined) {
+        statusCodeLoop: for (let j = 0; j < code.length; j++) {
+          if (code[i] === response.status) {
+            break statusCodeLoop;
+          }
+          if (j === callbacksOnResponse.length - 1) {
+            break callBackLoop;
+          }
+        }
+      }
+
+      if (method !== undefined && method.func !== undefined) {
+        if (method.params) {
+          if (!method.func(json, ...method.params)) {
+            break callBackLoop;
+          }
+        } else {
+          if (!method.func(json)) {
+            break callBackLoop;
+          }
+        }
+      }
+
+      if (params !== undefined) {
+        if (!Array.isArray(params)) {
+          params = [params];
+        }
+        func(...params);
+      } else {
+        func();
+      }
+    }
+
+    return Promise.resolve(json);
+  });
 }
 
-function checkStatus(response, callbacksByStatusCode) {
+function checkStatus(response) {
   // we assume 400 as valid code here because it's the default return code when sth has gone wrong,
   // but then we have an error within the response, no?
-
-  for (let index in callbacksByStatusCode) {
-    if (response.status != index) {
-      continue;
-    }
-
-    if (!Array.isArray(callbacksByStatusCode[index])) {
-      callbacksByStatusCode[index] = [callbacksByStatusCode[index]];
-    }
-
-    for (let i = 0; i < callbacksByStatusCode[index].length; i++) {
-      const { func, params } = callbacksByStatusCode[index][i];
-      func(...params);
-    }
-  }
-
   if (response.status >= 200 && response.status <= 400) {
     return response;
   }
